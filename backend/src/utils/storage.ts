@@ -14,5 +14,9 @@ export const readFavorites = (): Movie[] => {
 }
 
 export const writeFavorites = (movies: Movie[]) => {
+  const dir = path.dirname(filePath)
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
+  }
   fs.writeFileSync(filePath, JSON.stringify(movies, null, 2))
 }
