@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useDebounce } from "../hooks/useDebounce"
 
 interface Props {
   onSearch: (query: string) => void
@@ -8,14 +9,24 @@ const SearchBar = ({ onSearch }: Props) => {
 
   const [query, setQuery] = useState("")
 
-  const handleSearch = () => {
-    if (query.trim()) {
-      onSearch(query)
+  const debouncedQuery = useDebounce(query, 500)
+
+  useEffect(() => {
+
+    if (debouncedQuery.trim()) {
+      onSearch(debouncedQuery)
     }
+
+  }, [debouncedQuery])
+
+  const clearSearch = () => {
+    setQuery("")
+    onSearch("")
   }
 
   return (
     <div>
+
       <input
         type="text"
         placeholder="Search movies..."
@@ -23,9 +34,12 @@ const SearchBar = ({ onSearch }: Props) => {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      <button onClick={handleSearch}>
-        Search
-      </button>
+      {query && (
+        <button onClick={clearSearch}>
+          Clear
+        </button>
+      )}
+
     </div>
   )
 }

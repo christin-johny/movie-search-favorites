@@ -9,15 +9,21 @@ const HomePage = () => {
   const [movies, setMovies] = useState<Movie[]>([])
 
   const handleSearch = async (query: string) => {
+
+  if (!query) {
+    setMovies([])
+    return
+  }
+
   try {
 
     const res = await searchMovies(query)
 
-    setMovies(res.data.data.Search || [])
+    setMovies(res.data.data.movies || [])
 
   } catch (error) {
 
-    console.error("Search failed:", error)
+    console.error(error)
     setMovies([])
 
   }
