@@ -1,4 +1,4 @@
-import type { Request, Response } from "express"
+import { Request, Response } from "express"
 import axios from "axios"
 
 export const searchMovies = async (req: Request, res: Response) => {
