@@ -1,9 +1,8 @@
+import HomePage from "./pages/HomePage"
 
 const App = () => {
   return (
-    <div>
-      <h1>Movie Search App</h1>
-    </div>
+    <HomePage/>
   )
 }
 
