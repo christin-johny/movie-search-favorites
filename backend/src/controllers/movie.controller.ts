@@ -1,85 +1,61 @@
-import { Request, Response } from "express"
-import axios from "axios"
-import { readFavorites, writeFavorites } from "../utils/storage"
-import { Movie } from "../types/movie.types"
+import { Request, Response, NextFunction } from "express"
+import { MovieService } from "../services/movie.service"
+import { MESSAGES } from "../constants/messages.constants"
 
-export const searchMovies = async (req: Request, res: Response) => {
-
+export const searchMovies = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
     const { q, page = 1 } = req.query
 
-    if (!q) {
-      return res.status(400).json({
-        success: false,
-        message: "Search query is required"
-      })
-    }
-
-    const response = await axios.get(
-      `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&s=${q}&page=${page}`
-    )
+    const result = await MovieService.searchMovies(q as string, Number(page))
 
     res.json({
       success: true,
-      data: response.data
+      ...result
     })
 
   } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch movies"
-    })
-
+    next(error)
   }
-
 }
 
-export const getFavorites = (req: Request, res: Response) => {
-  const favorites = readFavorites()
+export const getFavorites = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { page = 1, limit = 10 } = req.query
+    const result = MovieService.getFavorites(Number(page), Number(limit))
 
-  res.json({
-    success: true,
-    data: favorites
-  })
-}
-
-export const addFavorite = (req: Request, res: Response) => {
-  const movie: Movie = req.body
-
-  const favorites = readFavorites()
-
-  const exists = favorites.find(f => f.imdbID === movie.imdbID)
-
-  if (exists) {
-    return res.status(400).json({
-      success: false,
-      message: "Movie already in favorites"
+    res.json({
+      success: true,
+      ...result
     })
+  } catch (error) {
+    next(error)
   }
-
-  favorites.push(movie)
-
-  writeFavorites(favorites)
-
-  res.json({
-    success: true,
-    message: "Movie added to favorites"
-  })
 }
 
-export const removeFavorite = (req: Request, res: Response) => {
-  const { id } = req.params
+export const addFavorite = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    MovieService.addFavorite(req.body)
 
-  let favorites = readFavorites()
+    res.json({
+      success: true,
+      message: MESSAGES.SUCCESS.MOVIE_ADDED
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
-  favorites = favorites.filter(movie => movie.imdbID !== id)
+export const removeFavorite = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params as { id: string }
 
-  writeFavorites(favorites)
+    MovieService.removeFavorite(id)
 
-  res.json({
-    success: true,
-    message: "Movie removed from favorites"
-  })
+    res.json({
+      success: true,
+      message: MESSAGES.SUCCESS.MOVIE_REMOVED
+    })
+  } catch (error) {
+    next(error)
+  }
 }
