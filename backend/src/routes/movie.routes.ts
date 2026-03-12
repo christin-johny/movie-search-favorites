@@ -1,4 +1,5 @@
 import { Router } from "express"
+import { API_ENDPOINTS } from "../constants/api.constants"
 import {
   searchMovies,
   getFavorites,
@@ -8,12 +9,12 @@ import {
 
 const router = Router()
 
-router.get("/search", searchMovies)
+router.get(API_ENDPOINTS.MOVIES.SEARCH, searchMovies)
 
-router.get("/favorites", getFavorites)
+router.get(API_ENDPOINTS.MOVIES.FAVORITES, getFavorites)
 
-router.post("/favorites", addFavorite)
+router.post(API_ENDPOINTS.MOVIES.FAVORITES, addFavorite)
 
-router.delete("/favorites/:id", removeFavorite)
+router.delete(API_ENDPOINTS.MOVIES.FAVORITE_BY_ID, removeFavorite)
 
 export default router
